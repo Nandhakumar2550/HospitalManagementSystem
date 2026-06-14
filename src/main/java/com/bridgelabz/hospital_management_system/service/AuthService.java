@@ -7,11 +7,13 @@ import com.bridgelabz.hospital_management_system.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.bridgelabz.hospital_management_system.config.JwtService;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
+    private final JwtService jwtService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -34,7 +36,25 @@ public class AuthService {
     }
 
     public String loginUser(AuthRequest request) {
-        return "JWT Implementation Pending";
+
+        User user = userRepository
+                .findByEmail(request.getEmail())
+                .orElse(null);
+
+        if (user == null) {
+            return null;
+        }
+
+        boolean validPassword =
+                passwordEncoder.matches(
+                        request.getPassword(),
+                        user.getPassword());
+
+        if (!validPassword) {
+            return null;
+        }
+
+        return jwtService.generateToken(user.getEmail());
     }
 
     public boolean authenticate(String email, String password) {

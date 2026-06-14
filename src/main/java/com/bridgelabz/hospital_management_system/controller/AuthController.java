@@ -29,11 +29,11 @@ public class AuthController {
     public AuthResponse login(
             @RequestBody AuthRequest request) {
 
-        String response =
-                authService.loginUser(request);
+        String token = authService.loginUser(request);
 
         return AuthResponse.builder()
-                .message(response)
+                .token(token)
+                .message("Login Successful")
                 .build();
     }
 }
